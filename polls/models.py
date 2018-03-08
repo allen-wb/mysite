@@ -1,10 +1,12 @@
 from django.db import models
 from django.utils import timezone
 import datetime
+import utils.uuidUtil as uuid
 
 
 # Create your models here.
 class Question(models.Model):
+    id = models.CharField(primary_key=True, default=uuid.get_uuid(), max_length=32)
     question_text = models.CharField(max_length=200)
     pub_date = models.DateTimeField('date published')
 
@@ -21,6 +23,7 @@ class Question(models.Model):
 
 
 class Choice(models.Model):
+    id = models.CharField(primary_key=True, default=uuid.get_uuid(), max_length=32)
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     choice_text = models.CharField(max_length=200)
     votes = models.IntegerField(default=0)
