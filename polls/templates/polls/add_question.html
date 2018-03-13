@@ -1,0 +1,12 @@
+{% extends 'admin/base.html' %}
+
+{% block content %}
+    <form action="{% url 'polls:save_question' %}" method="post">
+        {% csrf_token %}
+        <label>question_text:</label><input type="text" name="question_text"><br>
+        <label>choice:</label><br>
+        choice1:<input type="text" name="choice1"><br>
+        choice2:<input type="text" name="choice2"><br>
+        <input type="submit" value="submit"/>
+    </form>
+{% endblock %}
