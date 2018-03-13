@@ -6,6 +6,8 @@ from .models import Question, Choice
 from django.urls import reverse
 from django.views import generic
 from django.utils import timezone
+from datetime import datetime
+import utils.uuidUtil as uuid
 
 
 class IndexView(generic.ListView):
@@ -18,6 +20,24 @@ class IndexView(generic.ListView):
         published in the future).
         """
         return Question.objects.filter(pub_date__lte=timezone.now()).order_by('-pub_date')[:5]
+
+
+def add_question(request):
+    return render(request, 'polls/add_question.html')
+
+
+def save_question(request):
+    question_text = request.POST['question_text']
+    question_id = uuid.get_uuid()
+    question = Question(id=question_id, question_text=question_text, pub_date=datetime.now())
+    question.save()
+    choice1 = request.POST['choice1']
+    choice2 = request.POST['choice2']
+    choice_1 = Choice(choice_text=choice1, question_id=question_id)
+    choice_2 = Choice(choice_text=choice2, question_id=question_id)
+    choice_1.save()
+    choice_2.save()
+    return HttpResponseRedirect('/polls')
 
 
 class DetailView(generic.DetailView):
