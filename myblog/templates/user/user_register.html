@@ -1,0 +1,13 @@
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static 'polls/css/style.css' %}" />
+<div>
+    <form action="{% url 'user:register' %}" method="post">
+        {% csrf_token %}
+        姓名:<input name="true_name"><br>
+        用户名:<input name="user_name"><br>
+        密码:<input name="password" type="password"><br>
+        电话:<input name="tel"><br>
+        邮箱:<input name="email"><br>
+        <input type="submit" value="register">
+    </form>
+</div>
