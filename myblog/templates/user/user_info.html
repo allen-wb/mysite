@@ -1,5 +1,4 @@
 {% load static %}
-<link rel="stylesheet" type="text/css" href="{% static 'polls/css/style.css' %}" />
 <div>
     <form action="{% url 'user:update_user' %}" method="post" enctype="multipart/form-data" >
         {% csrf_token %}

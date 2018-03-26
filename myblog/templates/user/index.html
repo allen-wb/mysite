@@ -1,5 +1,18 @@
 {% load static %}
 <link rel="stylesheet" type="text/css" href="{% static 'polls/css/style.css' %}" />
+<script type="text/javascript" src="{% static 'mysite/common/js/jquery-3.1.1.js' %}"></script>
+<style>
+    .bodyBackground{
+        background: url("../../static/myblog/image/timg.jpg");
+    }
+    .login_box{
+        width: 20%;
+        height: 40%;
+        margin-left: 40%;
+        margin-top: 10%;
+    }
+</style>
+{% comment %}
 <div>
     {{ message }}
     <form action="{% url 'user:log_in' %}" method="post">
@@ -9,4 +22,49 @@
         <input type="submit" value="login">
         <a href="{% url 'user:to_register' %}">register</a>
     </form>
-</div>
+</div>{% endcomment %}
+
+<body class="bodyBackground">
+    <div class="login_box">
+        <div class="login_title">
+            <span style="font-size: 30px;">个人主页</span>
+        </div>
+        <form action="{% url 'user:log_in' %}" method="post" id="login_form">
+            {% csrf_token %}
+        	<label>用户名:<input type="text" name="username" id="username"></label><br>
+        	<label>密&nbsp;&nbsp;&nbsp;码:<input type="password" name="password" id="password"></label><br>
+        	<input type="checkbox">记住密码 <a href="">忘记密码</a><br>
+        	<input type="button" onclick="checkRegister()" value="登录">&nbsp;&nbsp;<input type="button" href="{% url 'user:to_register' %}" value="注册">
+        </form>
+    </div>
+</body>
+<script>
+    function checkRegister() {
+        var username = $('#username').val();
+        var password = $('#password').val();
+        if (username == "") {
+            alert("请填写用户名");
+            return;
+        }
+
+        if (password == "") {
+            alert("请填写密码");
+            return;
+        }
+
+        $.ajax({
+            url: 'log_in',
+            data: {'username': username, "password": password, 'csrfmiddlewaretoken': '{{ csrf_token }}'},
+            type: 'post',
+            success: function (data) {
+                console.log(data);
+                if(data.code == 200){
+                    window.location = 'http://127.0.0.1:8000/myblog/main_pages'
+                }
+            },
+            error: function () {
+
+            }
+        })
+    }
+</script>
