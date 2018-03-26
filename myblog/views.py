@@ -1,11 +1,11 @@
 from django.shortcuts import render, get_object_or_404, Http404
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.views import generic
 from .models import User
 from utils import uuidUtil
 from datetime import datetime
 from django.conf import settings
-import os
+import os, json
 
 
 # Create your views here.
@@ -33,25 +33,57 @@ def register(request):
 
 
 def log_in(request):
-    user_name = request.POST['user_name']
+    user_name = request.POST['username']
     password = request.POST['password']
     #
     try:
-        user = get_object_or_404(User, user_name=user_name, password=password)
-    except ValueError:
-        return HttpResponseRedirect('user/', message='用户名密码错误')
+        user = User.objects.get(user_name=user_name, password=password)
+    except User.DoesNotExist:
+        res = {'code': 100, 'message': '用户名密码错误'}
+        return HttpResponse(json.dumps(res), content_type='application/json')
+    # try:
+    #     user = get_object_or_404(User, user_name=user_name, password=password)
+    # except ValueError:
+    #     res = {'errorcode': 100, 'message': '用户名密码错误'}
+    #     return HttpResponse(json.dumps(res), content_type='application/json')
+        # return HttpResponseRedirect('user/', message='用户名密码错误')
     # if user is None:
     #     return HttpResponseRedirect('user/', message='用户名密码错误')
     # print('here')
     # session的使用
     request.session['name'] = user_name
     request.session['user_id'] = user.user_id
-    return HttpResponseRedirect('/myblog/' + user.user_id + '/user_info')
+    request.session.set_expiry(None)
+    res = {'code': 200, 'message': '登录成功'}
+    return HttpResponse(json.dumps(res), content_type='application/json')
 
 
-class UserInfoView(generic.DetailView):
-    model = User
-    template_name = 'user/user_info.html'
+def log_out(request):
+    del request.session['user_id']
+    res = {'code': 200, 'message': '退出成功'}
+    return HttpResponse(json.dumps(res), content_type='application/json')
+
+
+def main_pages(request):
+    user_id = request.session.get('user_id', None)
+    if user_id:
+        return render(request, 'user/main.html')
+    else:
+        return HttpResponseRedirect('/myblog')
+
+
+def user_info(request):
+    user_id = request.session['user_id']
+    if user_id:
+        try:
+            user = User.objects.get(pk=user_id)
+        except User.DoesNotExist:
+            res = {'code': 100, 'message': '用户名密码错误'}
+            return HttpResponse(json.dumps(res), content_type='application/json')
+        message = {'user': user}
+        return render(request, 'user/user_info.html', context=message)
+    # model = User
+    # template_name = 'user/user_info.html'
 
 
 def update_user(request):

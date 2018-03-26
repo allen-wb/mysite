@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>个人主页</title>
+    <link rel="stylesheet" href="">
+    {% load static %}
+    <script type="text/javascript" src="{% static 'mysite/common/js/jquery-3.1.1.js' %}"></script>
+    <style>
+    	html,body{height:100%; margin:0;}
+		#container{height:100%;}
+	</style>
+    <script type="text/javascript">
+        var baseUrl = "http://127.0.0.1:8000";
+        var data = {'csrfmiddlewaretoken': '{{ csrf_token }}'};
+        $(function(){
+            $(".clickMenu").click(function(){
+                var url = $(this).attr("data-url");
+	    		$.post(baseUrl + url, data, function(html){
+	    		    $("#content").html(html);
+	    		})
+	    	})
+    	});
+
+    	function logout(){
+            $.post(baseUrl + '/myblog/log_out', data, function (data) {
+                if(data  != undefined && data.code == 200){
+                    window.location = 'http://127.0.0.1:8000/myblog'
+                }
+            })
+        }
+
+    </script>
+</head>
+
+<body style="padding: 0;margin: 0">
+    <div id="container" style="border:0px solid #FF0000;width:auto;">
+        <div id="header" style="background-color:#B0E2FF;width:auto;height: 5%;">
+            <span style="font-size: xx-large;">XXX</span>
+            <span style="float: right" onclick="logout()"><img src="../../static/myblog/image/logout.png">退出</span>
+        </div>
+        <div id="menu" style="background-color:#4876FF;height:92%;width:150px;float:left;">
+            {% csrf_token %}
+            <ul>
+            	<li><span class="clickMenu" data-url="/myblog/user_info">个人中心</span></li>
+                <li><span class="clickMenu" data-url="url">修改密码</span></li>
+            	<li>js</li>
+            </ul>
+        </div>
+        <div id="content" style="background-color:#EEEEEE;height:auto;width:auto;float:left;">
+            主要内容
+        </div>
+        <div id="footer" style="height: 3%;background-color:#B0E2FF;clear:both;text-align:center;">版权 © xxxxx.com</div>
+    </div>
+</body>
+
+</html>
