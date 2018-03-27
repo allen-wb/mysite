@@ -4,24 +4,56 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>个人主页</title>
+    <title>title</title>
     <link rel="stylesheet" href="">
     {% load static %}
     <script type="text/javascript" src="{% static 'mysite/common/js/jquery-3.1.1.js' %}"></script>
     <style>
     	html,body{height:100%; margin:0;}
 		#container{height:100%;}
+        ul li{
+            list-style: none;
+        }
+        .menuOne{
+            padding-left: 0.5em;
+            font-size: 20px;
+        }
+        .menuOne img{
+            vertical-align: middle;
+        }
+        .menuTwo{
+            padding-left: 1.5em;
+            font-size: 16px;
+        }
 	</style>
     <script type="text/javascript">
         var baseUrl = "http://127.0.0.1:8000";
         var data = {'csrfmiddlewaretoken': '{{ csrf_token }}'};
         $(function(){
-            $(".clickMenu").click(function(){
+            $(".menuOne").click(function(){
+                var classNames = $(this).attr('class');
+                var _hidden;
+                if(classNames.indexOf('hiddenSon') != -1){
+                    _hidden = false;
+                    $(this).removeClass('hiddenSon').addClass('showSon');
+                    $(this).children().attr('src', '../../static/myblog/image/more_unfold.png');
+                }else {
+                    _hidden = true;
+                    $(this).removeClass('showSon').addClass('hiddenSon');
+                    $(this).children().attr('src', '../../static/myblog/image/more.png');
+                }
+                var menuTwo = $(this).parent().children();
+                for(var i = 1; i < menuTwo.length; i++){
+                    menuTwo[i].hidden = _hidden;
+                }
+	    	});
+
+            $(".menuTwo").click(function(){
                 var url = $(this).attr("data-url");
 	    		$.post(baseUrl + url, data, function(html){
 	    		    $("#content").html(html);
-	    		})
-	    	})
+	    		});
+            });
     	});
 
     	function logout(){
@@ -43,11 +75,15 @@
         </div>
         <div id="menu" style="background-color:#4876FF;height:92%;width:150px;float:left;">
             {% csrf_token %}
-            <ul>
+            <div><span class="menuOne hiddenSon">个人中心<img src="../../static/myblog/image/more.png"></span>
+                <div class="menuTwo" data-url="/myblog/user_info" hidden="hidden">个人信息</div>
+                <div class="menuTwo" data-url="" hidden="hidden">密码修改</div>
+            </div>
+            {% comment %}<ul>
             	<li><span class="clickMenu" data-url="/myblog/user_info">个人中心</span></li>
                 <li><span class="clickMenu" data-url="url">修改密码</span></li>
             	<li>js</li>
-            </ul>
+            </ul>{% endcomment %}
         </div>
         <div id="content" style="background-color:#EEEEEE;height:auto;width:auto;float:left;">
             主要内容
