@@ -1,10 +1,11 @@
 from django.shortcuts import render, get_object_or_404, Http404
 from django.http import HttpResponseRedirect, HttpResponse
 from django.views import generic
-from .models import User
+from .models import User, Blog
 from utils import uuidUtil
 from datetime import datetime
 from django.conf import settings
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 import os, json
 
 
@@ -110,4 +111,17 @@ def update_user(request):
     user.age = age
     user.save()
     return HttpResponseRedirect('/myblog/' + user.user_id + '/user_info')
+
+
+def blog_list(request):
+    blog_list = Blog.objects.all()
+    paginator = Paginator(blog_list, 10)
+    page = request.POST.get('page', None)
+    try:
+        blog = paginator.page(page)
+    except PageNotAnInteger:
+        blog = paginator.page(1)
+    except EmptyPage:
+        blog = paginator.page(paginator.num_pages)
+    return render(request, 'blog/blog_list.html', {'blog_list': blog})
 

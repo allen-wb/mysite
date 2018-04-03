@@ -1,0 +1,70 @@
+{% load static %}
+<script type="text/javascript" src="{% static 'mysite/common/js/jquery-3.1.1.js' %}"></script>
+{% if blog_list %}
+    <table>
+        <thead>
+            <th>序号</th>
+            <th>标题</th>
+            <th>关键字</th>
+            <th>内容</th>
+            <th>创建时间</th>
+            <th>创建人</th>
+        </thead>
+        <tbody>
+        {% for blog in blog_list%}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ blog.blog_title }}</td>
+                <td>{{ blog.blog_about }}</td>
+                <td>{{ blog.blog_content }}</td>
+                <td>{{ blog.create_date }}</td>
+                <td>{{ blog.creater }}</td>
+            </tr>
+            {# Each "contact" is a Contact model object. #}
+{#            {{ blog.blog_title}}<br />#}
+        {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    {{ 'no data' }}
+{% endif %}
+<nav aria-label="Page navigation">
+{% csrf_token %}
+    <ul class="pagination">
+        {% if blog_list.has_previous %}
+            <i>
+                <a data-url="/myblog/blog_list?page={{ blog_list.previous_page_number }}" href="" class="pageChange" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </i>
+        {% endif %}
+
+        {% for pg in blog_list.paginator.page_range %}
+            {% if blog_list.number == pg %}
+                <li class="active"><a data-url="/myblog/blog_list" class="pageChange">{{ pg }}</a></li>
+            {% else %}
+                <li><a data-url="/myblog/blog_list" class="pageChange">{{ pg }}</a></li>
+            {% endif %}
+        {% endfor %}
+
+        {% if blog_list.has_next %}
+            <li>
+                <a href="?page={{ blog_list.next_page_number }}" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+        {% endif %}
+    </ul>
+</nav>
+<script>
+    $(function () {
+        var baseUrl = "http://127.0.0.1:8000";
+        $('.pageChange').click(function () {
+            var url = $(this).attr('data-url');
+            var data = {page: $(this).html(),'csrfmiddlewaretoken': '{{ csrf_token }}'};
+            $.post(baseUrl + url, data, function(html){
+                $("#content").html(html);
+            });
+        });
+    });
+</script>
