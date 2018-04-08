@@ -34,8 +34,12 @@ def register(request):
 
 
 def log_in(request):
-    user_name = request.POST['username']
-    password = request.POST['password']
+    # user_name = request.POST['username']
+    # password = request.POST['password']
+    body_unicode = request.body.decode('utf-8')
+    body = json.loads(body_unicode)
+    user_name = body['username']
+    password = body['password']
     #
     try:
         user = User.objects.get(user_name=user_name, password=password)
