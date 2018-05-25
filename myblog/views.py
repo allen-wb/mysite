@@ -6,7 +6,9 @@ from utils import uuidUtil
 from datetime import datetime
 from django.conf import settings
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.core import serializers
 import os, json
+from django.db import models
 
 
 # Create your views here.
@@ -61,6 +63,26 @@ def log_in(request):
     request.session.set_expiry(None)
     res = {'code': 200, 'message': '登录成功'}
     return HttpResponse(json.dumps(res), content_type='application/json')
+
+
+class Menu(models.Model):
+    menu_id = models.CharField(primary_key=True, max_length=32)
+    menu_name = models.CharField(max_length=20)
+    menu_order = models.IntegerField()
+    menu_level = models.IntegerField()
+
+    def toJSON(self):
+        import json
+        return json.dumps(dict([(attr, getattr(self, attr)) for attr in [f.name for f in self._meta.fields]]))
+
+
+def get_menus(request):
+    menus = [Menu('erwer', '菜单一', 0, 1)]
+    menus.append(Menu('wrewr', '菜单二', 1, 1))
+    menus.append(Menu('rwerer', '菜单三', 2, 1))
+    data = serializers.serialize('json', menus, ensure_ascii=False)
+    res = {'code': 200, 'message': data}
+    return HttpResponse(data, content_type='application/json')
 
 
 def log_out(request):
